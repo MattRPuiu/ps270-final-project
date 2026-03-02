@@ -1,14 +1,44 @@
 ---
 title: "PS270 Final Project"
-author: Rares Matei Puiu
+author: Rares-Matei Puiu
 description: "The poll to election dialectic"
 output:
   distill::distill_article:
     self_contained: false
 ---
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+rm(list=ls())
+library(tidyverse)
+echo=F
+```
 
 
-## Project thoughts
+## **Milestone 2: Dataset and Research Question**
 
-I am interested in exploring data related to Romania's 2024 presidential election when polling seemed to miss Calin Georgescu. I will attempt to look into whether some voters were harder to reach, less willing to say who they supported, decided late, turned out in unexpected places, or were influenced by what they were seeing online.
+I am currently refining the precise focus of this project, but at this stage I plan to use a dataset derived from an **AtlasIntel** national poll fielded November 9–12, 2024 that reports Călin Georgescu’s vote intention as percentages within demographic subgroups (including age, income, and education), alongside a benchmark row recording his official first-round vote share (22.94%). I made the csv file myself so bare with it as I further develop and refine it for the final deadline.
+
+While I initially considered education as the primary explanatory variable, I now believe income level provides a clearer theoretical basis for analysis. My tentative research question is: **How is Georgescu’s reported support in the poll related to respondents’ income level?** I hypothesize that Georgescu’s support will be higher among lower-income respondents and lower among higher-income respondents. The theoretical logic is that anti-establishment candidates often mobilize voters who perceive themselves as economically insecure or excluded from the benefits of the existing political and economic order, whereas higher-income voters may have stronger incentives to prefer stability and institutional continuity.
+
+My explanatory variable is **income level**, measured using the ordered income categories reported in the poll (e.g., <3000 RON, 3000–5000 RON, 5000–7000 RON, etc.), which provides observable variation across multiple brackets. My outcome variable is **Georgescu’s vote intention percentage**, measured as georgescu_pct within each income subgroup. Evidence supporting my hypothesis would be a statistically significant negative relationship between ordered income level and Georgescu’s support in a regression model (optionally weighted by subgroup sample size), indicating that support declines as income increases. Evidence against the hypothesis would be a relationship near zero or positive, suggesting that income does not systematically structure support for Georgescu in this poll.
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+
+
+
+poll <- read_csv("data/georgescu.csv", show_col_types = FALSE)
+
+poll |>
+  select(sample_n, segment_type, segment, georgescu_pct) |>
+  tail(5) |>
+  rename(
+    "Subgroup Sample" = sample_n,
+    "Category Type" = segment_type,
+    "Category" = segment,
+    "Georgescu Support (%)" = georgescu_pct
+  ) |>
+  kable(digits = 1)
+```
