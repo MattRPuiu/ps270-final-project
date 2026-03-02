@@ -1,20 +1,19 @@
 ---
 title: "PS270 Final Project"
 author: Rares-Matei Puiu
-description: "The poll to election dialectic"
+description: "Do Romanian working-class voters feel left behind?"
 output:
   distill::distill_article:
     self_contained: false
 ---
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=F}
 rm(list=ls())
 library(tidyverse)
-echo=F
 ```
 
 
-## **Milestone 2: Dataset and Research Question**
+# **Milestone 2: Dataset and Research Question**
 
 I am currently refining the precise focus of this project, but at this stage I plan to use a dataset derived from an **AtlasIntel** national poll fielded November 9–12, 2024 that reports Călin Georgescu’s vote intention as percentages within demographic subgroups (including age, income, and education), alongside a benchmark row recording his official first-round vote share (22.94%). I made the csv file myself so bare with it as I further develop and refine it for the final deadline.
 
@@ -24,7 +23,8 @@ My explanatory variable is **income level**, measured using the ordered income c
 
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+```{r, echo=F}
 library(knitr)
 
 
@@ -42,3 +42,4 @@ poll |>
   ) |>
   kable(digits = 1)
 ```
+_Source: AtlasIntel national poll (Nov 9–12, 2024)._

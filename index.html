@@ -91,7 +91,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_meta_tags-->
   <title>PS270 Final Project</title>
 
-  <meta property="description" itemprop="description" content="The poll to election dialectic"/>
+  <meta property="description" itemprop="description" content="Do Romanian working-class voters feel left behind?"/>
 
 
   <meta name="article:author" content="Rares-Matei Puiu"/>
@@ -99,19 +99,19 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
   <meta property="og:title" content="PS270 Final Project"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="The poll to election dialectic"/>
+  <meta property="og:description" content="Do Romanian working-class voters feel left behind?"/>
   <meta property="og:locale" content="en_US"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
   <meta property="twitter:title" content="PS270 Final Project"/>
-  <meta property="twitter:description" content="The poll to election dialectic"/>
+  <meta property="twitter:description" content="Do Romanian working-class voters feel left behind?"/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","description","output"]}},"value":[{"type":"character","attributes":{},"value":["PS270 Final Project"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Rares-Matei Puiu"]}]}]},{"type":"character","attributes":{},"value":["The poll to election dialectic"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","author","description","output"]}},"value":[{"type":"character","attributes":{},"value":["PS270 Final Project"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Rares-Matei Puiu"]}]}]},{"type":"character","attributes":{},"value":["Do Romanian working-class voters feel left behind?"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
@@ -1519,7 +1519,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"PS270 Final Project","description":"The poll to election dialectic","authors":[{"author":"Rares-Matei Puiu","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}]}
+{"title":"PS270 Final Project","description":"Do Romanian working-class voters feel left behind?","authors":[{"author":"Rares-Matei Puiu","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1533,7 +1533,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p>The poll to election dialectic</p>
+<p>Do Romanian working-class voters feel left behind?</p>
 </div>
 
 <div class="d-byline">
@@ -1547,7 +1547,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="layout-chunk" data-layout="l-body">
 
 </div>
-<h2 id="milestone-2-dataset-and-research-question"><strong>Milestone 2: Dataset and Research Question</strong></h2>
+<h1 id="milestone-2-dataset-and-research-question"><strong>Milestone 2: Dataset and Research Question</strong></h1>
 <p>I am currently refining the precise focus of this project, but at this stage I plan to use a dataset derived from an <strong>AtlasIntel</strong> national poll fielded November 9–12, 2024 that reports Călin Georgescu’s vote intention as percentages within demographic subgroups (including age, income, and education), alongside a benchmark row recording his official first-round vote share (22.94%). I made the csv file myself so bare with it as I further develop and refine it for the final deadline.</p>
 <p>While I initially considered education as the primary explanatory variable, I now believe income level provides a clearer theoretical basis for analysis. My tentative research question is: <strong>How is Georgescu’s reported support in the poll related to respondents’ income level?</strong> I hypothesize that Georgescu’s support will be higher among lower-income respondents and lower among higher-income respondents. The theoretical logic is that anti-establishment candidates often mobilize voters who perceive themselves as economically insecure or excluded from the benefits of the existing political and economic order, whereas higher-income voters may have stronger incentives to prefer stability and institutional continuity.</p>
 <p>My explanatory variable is <strong>income level</strong>, measured using the ordered income categories reported in the poll (e.g., &lt;3000 RON, 3000–5000 RON, 5000–7000 RON, etc.), which provides observable variation across multiple brackets. My outcome variable is <strong>Georgescu’s vote intention percentage</strong>, measured as georgescu_pct within each income subgroup. Evidence supporting my hypothesis would be a statistically significant negative relationship between ordered income level and Georgescu’s support in a regression model (optionally weighted by subgroup sample size), indicating that support declines as income increases. Evidence against the hypothesis would be a relationship near zero or positive, suggesting that income does not systematically structure support for Georgescu in this poll.</p>
@@ -1601,6 +1601,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </tbody>
 </table>
 </div>
+<p><em>Source: AtlasIntel national poll (Nov 9–12, 2024).</em></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
