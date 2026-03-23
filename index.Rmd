@@ -12,7 +12,6 @@ rm(list=ls())
 library(tidyverse)
 ```
 
-
 # **Milestone 2: Dataset and Research Question**
 
 I am currently refining the precise focus of this project, but at this stage I plan to use a dataset derived from an **AtlasIntel** national poll fielded November 9–12, 2024 that reports Călin Georgescu’s vote intention as percentages within demographic subgroups (including age, income, and education), alongside a benchmark row recording his official first-round vote share (22.94%). I made the csv file myself so bare with it as I further develop and refine it for the final deadline.
