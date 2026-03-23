@@ -20,20 +20,20 @@ On May 18, 2025, Romania held the second round of its presidential election. Ind
 
 This project merges official AEP election results with county-level economic and demographic indicators to ask: **how is county-level support for Nicusor Dan related to average income?** I hypothesize that Dan's vote share will be higher in wealthier counties and lower in poorer ones. The theoretical logic is that Dan, an independent pro-EU technocrat, appealed to urban, economically integrated voters, while Simion mobilized support in counties where incomes are lower and dissatisfaction with the economic status quo runs deeper.
 
-My explanatory variable is **average net monthly salary** (`Avg_Net_Salary_RON_Jun2025`), measured in RON per county as reported by INS. My outcome variable is **Nicusor Dan's vote share** (`Nicusor_Dan_Pct`), the percentage of valid votes he received in each county. Evidence supporting my hypothesis would be a positive relationship between salary and Dan's vote share. Evidence against would be a flat or negative relationship.
+My explanatory variable is **average net monthly salary** (`Avg_Net_Salary_RON_Jun2025`), measured in RON per county as reported by INS. My outcome variable is **Nicusor Dan's vote share** (`Nicusor_Dan_Pct`), the percentage of valid votes he received in each county. Evidence supporting my hypothesis would be a positive relationship between salary and Dan's vote share. Evidence against would be a flat or downright negative relationship.
 
 ## Loading the Data
 
 ```{r}
 vote <- read.csv("data/prez2025.csv")
-head(vote)
+glimpse(vote)
 ```
 
 ## Data Cleaning
 
 I create a new variable for the vote margin between the two candidates, convert the Winner column into a factor so it maps cleanly to colors in the plot, bin counties into salary tiers, and flag whether each county is majority urban or rural.
 
-```{r}
+```{r, echo=FALSE}
 vote_clean <- vote |>
   mutate(
     Dan_Margin = Nicusor_Dan_Pct - George_Simion_Pct,
@@ -47,7 +47,21 @@ vote_clean <- vote |>
   )
 ```
 
-```{r}
+```{r, echo=FALSE}
+vote_clean |>
+  group_by(Urban_Rural) |>
+  summarize(
+    avg_dan_pct = mean(Nicusor_Dan_Pct),
+    avg_simion_pct = mean(George_Simion_Pct),
+    avg_salary = mean(Avg_Net_Salary_RON_Jun2025),
+    n = n()
+  ) |>
+  knitr::kable(
+    digits = 1,
+    col.names = c("Type", "Avg Dan %", "Avg Simion %", "Avg Salary (RON)", "N Counties")
+  )
+```
+```{r, echo=FALSE}
 vote_clean |>
   group_by(Salary_Group) |>
   summarize(
