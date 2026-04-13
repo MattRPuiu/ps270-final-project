@@ -12,28 +12,26 @@ rm(list=ls())
 library(tidyverse)
 ```
 
-# **Milestone 3: Data Cleaning and Visualization**
+# **Milestone 4: Visualization and Analysis**
 
 ## Project Overview
 
 On May 18, 2025, Romania held the second round of its presidential election. Independent candidate Nicusor Dan defeated George Simion (AUR) with 53.6% of the vote nationally, but the county-level map told a more striking story. Dan swept the wealthier, more urbanized counties (Cluj, Timis, Brasov, Bucuresti), while Simion dominated poorer, more rural ones (Gorj, Calarasi, Tulcea, Suceava).
 
-This project merges official AEP election results with county-level economic and demographic indicators to ask: **how is county-level support for Nicusor Dan related to average income?** I hypothesize that Dan's vote share will be higher in wealthier counties and lower in poorer ones. The theoretical logic is that Dan, an independent pro-EU technocrat, appealed to urban, economically integrated voters, while Simion mobilized support in counties where incomes are lower and dissatisfaction with the economic status quo runs deeper.
+This project merges official AEP election results with county-level economic and demographic indicators to ask: **how is county-level support for Nicusor Dan related to average income?**
+**I hypothesize that Dan's vote share will be higher in wealthier counties and lower in poorer ones.**
+
+The theoretical logic is that Dan, as an independent pro-EU technocrat, appealed to urban, economically integrated voters, while Simion mobilized support in counties where incomes are lower and dissatisfaction with the economic status quo runs deeper.
 
 My explanatory variable is **average net monthly salary** (`Avg_Net_Salary_RON_Jun2025`), measured in RON per county as reported by INS. My outcome variable is **Nicusor Dan's vote share** (`Nicusor_Dan_Pct`), the percentage of valid votes he received in each county. Evidence supporting my hypothesis would be a positive relationship between salary and Dan's vote share. Evidence against would be a flat or downright negative relationship.
 
-## Loading the Data
-
-```{r}
-vote <- read.csv("data/prez2025.csv")
-glimpse(vote)
-```
-
-## Data Cleaning
+## Loading the Data & Cleaning It
 
 I create a new variable for the vote margin between the two candidates, convert the Winner column into a factor so it maps cleanly to colors in the plot, bin counties into salary tiers, and flag whether each county is majority urban or rural.
 
 ```{r, echo=FALSE}
+vote <- read.csv("data/prez2025.csv")
+
 vote_clean <- vote |>
   mutate(
     Dan_Margin = Nicusor_Dan_Pct - George_Simion_Pct,
@@ -45,6 +43,7 @@ vote_clean <- vote |>
     ),
     Urban_Rural = if_else(Pct_Urban >= 50, "Majority Urban", "Majority Rural")
   )
+vote_clean
 ```
 
 ```{r, echo=FALSE}
@@ -79,18 +78,24 @@ vote_clean |>
 
 ```{r}
 ggplot(data = vote_clean,
-       mapping = aes(x = Avg_Net_Salary_RON_Jun2025,
-                     y = Nicusor_Dan_Pct,
+       mapping = aes(x = Nicusor_Dan_Pct,
+                     y = Avg_Net_Salary_RON_Jun2025,
                      color = Winner)) +
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("Dan" = "steelblue1", "Simion" = "indianred1")) +
-  labs(x = "Average Net Monthly Salary (RON, June 2025)",
-       y = "Nicusor Dan Vote Share (%)",
+  labs(x = "Nicusor Dan Vote Share (%)",
+       y = "Average Net Monthly Salary (RON, June 2025)",
        title = "Richer Counties Voted for Dan, Poorer Counties for Simion",
        subtitle = "Romania 2025 Presidential Election, Round 2 (42 counties)")
+
 ```
 
-The plot shows a clear positive relationship between average salary and Dan's vote share. Counties where Dan won cluster on the right side of the plot with higher salaries, while counties where Simion won cluster on the left with lower salaries. The regression line slopes upward, supporting the hypothesis that wealthier counties gave Dan more support. Bucuresti sits at the far right as the highest-salary county and Dan's strongest urban base. Notable outliers include Harghita and Covasna, which voted overwhelmingly for Dan despite modest salaries, likely driven by ethnic rather than economic factors. Gorj is the inverse: relatively high GDP from mining and energy, but 61% for Simion.
+The plot shows a weak relationship between average salary and Nicusor Dan’s vote share once counties are separated by winner. Among counties won by Dan (blue), the regression line is nearly flat, indicating that increases in salary are not strongly associated with higher vote share within this group. Among counties won by Simion (red), the line slopes slightly downward, suggesting that even in slightly wealthier counties within this group, Dan’s vote share remains relatively low.
+
+Rather than showing a strong continuous relationship, the plot highlights a divide between two clusters: lower-income counties where Simion won and higher-income counties where Dan performed better. This suggests that income helps distinguish which candidate wins a county, but does not strongly explain variation in Dan’s vote share within those groups.
+
+Bucuresti appears as a high-salary, high-support outlier for Dan, while counties such as Harghita and Covasna show high support for Dan despite their more moderate income levels. These cases suggest that factors beyond income, such as regional or ethnographic characteristics, may also influence voting behavior.
+Overall, the visualization provides limited support for the hypothesis: wealthier counties are more likely to support Dan, but income alone is not a strong predictor of variation in vote share across all counties.
 
 _Sources: AEP/prezenta.roaep.ro (election results); OECD Regional Statistics (GDP); INS TEMPO Online (salary, population); Romanian Census 2021 (demographics)._
