@@ -116,7 +116,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["data/prez2025.csv","index_files/anchor-4.2.2/anchor.min.js","index_files/bowser-1.9.3/bowser.min.js","index_files/distill-2.2.21/template.v2.js","index_files/figure-html5/unnamed-chunk-5-1.png","index_files/figure-html5/unnamed-chunk-6-1.png","index_files/header-attrs-2.17/header-attrs.js","index_files/header-attrs-2.30/header-attrs.js","index_files/header-attrs-2.31/header-attrs.js","index_files/jquery-3.6.0/jquery-3.6.0.js","index_files/jquery-3.6.0/jquery-3.6.0.min.js","index_files/jquery-3.6.0/jquery-3.6.0.min.map","index_files/popper-2.6.0/popper.min.js","index_files/tippy-6.2.7/tippy-bundle.umd.min.js","index_files/tippy-6.2.7/tippy-light-border.css","index_files/tippy-6.2.7/tippy.css","index_files/tippy-6.2.7/tippy.umd.min.js","index_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["data/prez2025.csv","index_files/anchor-4.2.2/anchor.min.js","index_files/bowser-1.9.3/bowser.min.js","index_files/distill-2.2.21/template.v2.js","index_files/figure-html5/unnamed-chunk-5-1.png","index_files/figure-html5/unnamed-chunk-6-1.png","index_files/figure-html5/unnamed-chunk-7-1.png","index_files/header-attrs-2.17/header-attrs.js","index_files/header-attrs-2.30/header-attrs.js","index_files/header-attrs-2.31/header-attrs.js","index_files/jquery-3.6.0/jquery-3.6.0.js","index_files/jquery-3.6.0/jquery-3.6.0.min.js","index_files/jquery-3.6.0/jquery-3.6.0.min.map","index_files/popper-2.6.0/popper.min.js","index_files/tippy-6.2.7/tippy-bundle.umd.min.js","index_files/tippy-6.2.7/tippy-light-border.css","index_files/tippy-6.2.7/tippy.css","index_files/tippy-6.2.7/tippy.umd.min.js","index_files/webcomponents-2.0.0/webcomponents.js","Untitled_files/anchor-4.2.2/anchor.min.js","Untitled_files/bowser-1.9.3/bowser.min.js","Untitled_files/distill-2.2.21/template.v2.js","Untitled_files/figure-html5/unnamed-chunk-5-1.png","Untitled_files/header-attrs-2.31/header-attrs.js","Untitled_files/jquery-3.6.0/jquery-3.6.0.js","Untitled_files/jquery-3.6.0/jquery-3.6.0.min.js","Untitled_files/jquery-3.6.0/jquery-3.6.0.min.map","Untitled_files/popper-2.6.0/popper.min.js","Untitled_files/tippy-6.2.7/tippy-bundle.umd.min.js","Untitled_files/tippy-6.2.7/tippy-light-border.css","Untitled_files/tippy-6.2.7/tippy.css","Untitled_files/tippy-6.2.7/tippy.umd.min.js","Untitled_files/webcomponents-2.0.0/webcomponents.js","Untitled.html"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1554,8 +1554,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <strong>I hypothesize that Dan’s vote share will be higher in wealthier counties and lower in poorer ones.</strong></p>
 <p>The theoretical logic is that Dan, as an independent pro-EU technocrat, appealed to urban, economically integrated voters, while Simion mobilized support in counties where incomes are lower and dissatisfaction with the economic status quo runs deeper.</p>
 <p>My explanatory variable is <strong>average net monthly salary</strong> (<code>Avg_Net_Salary_RON_Jun2025</code>), measured in RON per county as reported by INS. My outcome variable is <strong>Nicusor Dan’s vote share</strong> (<code>Nicusor_Dan_Pct</code>), the percentage of valid votes he received in each county. Evidence supporting my hypothesis would be a positive relationship between salary and Dan’s vote share. Evidence against would be a flat or downright negative relationship.</p>
+<p>To make this testable, I set up the regression slope on salary as the parameter I care about. The null hypothesis is that salary and Dan’s vote share are unrelated across counties, meaning the true slope is zero. The alternative is that there is some association, positive or negative. Because my hypothesis is directional (more money, more Dan support), I expect a positive slope, but I will use a two-sided test at the usual 0.05 level so I do not give myself credit for a result that happens to land on the “right” side by chance. Following the setup from lecture, the test statistic takes the form of observed value minus null guess, all divided by the standard error, and by the CLT it is approximately standard normal under the null. The decision rule is simple: reject the null if the test statistic is further than 1.96 from zero in either direction, which is the same as rejecting if the p-value is below 0.05.</p>
 <h2 id="loading-the-data-cleaning-it">Loading the Data &amp; Cleaning It</h2>
-<p>I create a new variable for the vote margin between the two candidates, convert the Winner column into a factor so it maps cleanly to colors in the plot, bin counties into salary tiers, and flag whether each county is majority urban or rural.</p>
+<p>I create a new variable for the vote margin between the two candidates, convert the Winner column into a factor, bin counties into salary tiers, and flag whether each county is majority urban or rural.</p>
 <div class="layout-chunk" data-layout="l-body">
 <pre><code>            County Nicusor_Dan_Votes Nicusor_Dan_Pct
 1             Alba             90248           51.70
@@ -1924,25 +1925,100 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class='fu'>ggplot</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>vote_clean</span>,</span>
-<span>       mapping <span class='op'>=</span> <span class='fu'>aes</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>Nicusor_Dan_Pct</span>,</span>
-<span>                     y <span class='op'>=</span> <span class='va'>Avg_Net_Salary_RON_Jun2025</span>,</span>
-<span>                     color <span class='op'>=</span> <span class='va'>Winner</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
-<span>  <span class='fu'>geom_point</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
-<span>  <span class='fu'>geom_smooth</span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"lm"</span>, se <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>+</span></span>
-<span>  <span class='fu'>scale_color_manual</span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Dan"</span> <span class='op'>=</span> <span class='st'>"steelblue1"</span>, <span class='st'>"Simion"</span> <span class='op'>=</span> <span class='st'>"indianred1"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
-<span>  <span class='fu'>labs</span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>"Nicusor Dan Vote Share (%)"</span>,</span>
-<span>       y <span class='op'>=</span> <span class='st'>"Average Net Monthly Salary (RON, June 2025)"</span>,</span>
-<span>       title <span class='op'>=</span> <span class='st'>"Richer Counties Voted for Dan, Poorer Counties for Simion"</span>,</span>
-<span>       subtitle <span class='op'>=</span> <span class='st'>"Romania 2025 Presidential Election, Round 2 (42 counties)"</span><span class='op'>)</span></span></code></pre>
+<span>       mapping <span class='op'>=</span> <span class='fu'>aes</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>Avg_Net_Salary_RON_Jun2025</span>,</span>
+<span>                     y <span class='op'>=</span> <span class='va'>Nicusor_Dan_Pct</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'>geom_point</span><span class='op'>(</span>color <span class='op'>=</span> <span class='st'>"steelblue1"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'>geom_smooth</span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"lm"</span>, se <span class='op'>=</span> <span class='cn'>FALSE</span>, color <span class='op'>=</span> <span class='st'>"steelblue4"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'>labs</span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>"Average Net Monthly Salary (RON, June 2025)"</span>,</span>
+<span>       y <span class='op'>=</span> <span class='st'>"Nicusor Dan Vote Share (%)"</span><span class='op'>)</span></span></code></pre>
 </div>
 <p><img src="index_files/figure-html5/unnamed-chunk-5-1.png" alt="" width="624" /></p>
 </div>
-<p>The plot shows a weak relationship between average salary and Nicusor Dan’s vote share once counties are separated by winner. Among counties won by Dan (blue), the regression line is nearly flat, indicating that increases in salary are not strongly associated with higher vote share within this group. Among counties won by Simion (red), the line slopes slightly downward, suggesting that even in slightly wealthier counties within this group, Dan’s vote share remains relatively low.</p>
-<p>Rather than showing a strong continuous relationship, the plot highlights a divide between two clusters: lower-income counties where Simion won and higher-income counties where Dan performed better. This suggests that income helps distinguish which candidate wins a county, but does not strongly explain variation in Dan’s vote share within those groups.</p>
-<p>Bucuresti appears as a high-salary, high-support outlier for Dan, while counties such as Harghita and Covasna show high support for Dan despite their more moderate income levels. These cases suggest that factors beyond income, such as regional or ethnographic characteristics, may also influence voting behavior.
-Overall, the visualization provides limited support for the hypothesis: wealthier counties are more likely to support Dan, but income alone is not a strong predictor of variation in vote share across all counties.</p>
+<p>The plot shows a positive relationship between average salary and Nicusor Dan’s vote share across Romania’s 42 counties. As average monthly salary rises, Dan’s vote share tends to rise with it, consistent with the hypothesis that wealthier counties were more supportive of the moderate pro-EU independent candidate.</p>
+<p>The relationship is positive but not tight. There is substantial scatter around the line. Bucuresti appears as a high-salary, high-support point in the upper right, while Harghita and Covasna sit well above the line, with extremely high Dan vote share despite only moderate incomes. These two counties are majority Hungarian-speaking and have a distinct voting history, suggesting that factors beyond income (regional identity, ethnicity, Simion’s xenophobia) also shape vote choice.</p>
+<h2 id="regression-and-hypothesis-test">Regression and Hypothesis Test</h2>
+<p>To put a number on the relationship and formally test whether the slope on salary is different from zero, I fit a linear regression of Dan’s vote share on average net monthly salary.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>Nicusor_Dan_Pct</span> <span class='op'>~</span> <span class='va'>Avg_Net_Salary_RON_Jun2025</span>, data <span class='op'>=</span> <span class='va'>vote_clean</span><span class='op'>)</span></span>
+<span><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>)</span></span></code></pre>
+</div>
+<pre><code>
+Call:
+lm(formula = Nicusor_Dan_Pct ~ Avg_Net_Salary_RON_Jun2025, data = vote_clean)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-14.584  -6.055  -2.621   2.054  40.716 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)                29.552264  12.860019   2.298   0.0269 *
+Avg_Net_Salary_RON_Jun2025  0.004821   0.002637   1.828   0.0750 .
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 10.96 on 40 degrees of freedom
+Multiple R-squared:  0.07711,   Adjusted R-squared:  0.05403 
+F-statistic: 3.342 on 1 and 40 DF,  p-value: 0.075</code></pre>
+</div>
+<h3 id="interpreting-the-bivariate-regression">Interpreting the bivariate regression</h3>
+<p>The estimated slope on salary is about 0.00482. Because salary is measured in RON and Dan’s vote share is measured in percentage points, that coefficient says each extra 1 RON of average monthly salary is associated with about a 0.00482 percentage-point increase in Dan’s vote share. That number is hard to feel, so rescaling: <strong>every additional 1,000 RON of average monthly salary is associated with roughly a 4.82 percentage-point increase in Dan’s vote share</strong>.</p>
+<p>The intercept is about 29.55, which would be the model’s prediction for Dan’s vote share in a county with zero average salary. That number has no substantive interpretation (no such county exists, and even Romania’s poorest counties are nowhere near zero), it is just where the line crosses the y-axis to fit the data that does exist.</p>
+<p>Now the hypothesis test. The <code>summary()</code> output gives a test statistic for the salary coefficient of about 1.83 and a p-value of about 0.075. Reading those through the lecture framework: the test statistic is the slope divided by its standard error, so 1.83 means the estimated slope is about 1.83 standard errors away from zero. The decision rule was to reject the null if that statistic was further than 1.96 from zero, and 1.83 does not clear that bar. Equivalently, the p-value of 0.075 says that if the true slope really were zero, we would still see a slope at least this large in absolute value about 7.5% of the time just from random sampling variation across counties. That is uncommon, but not rare enough to rule out chance at the 0.05 level (95 CI)</p>
+<p>Thus, strictly speaking, <strong>I failed to reject the null hypothesis</strong>. I would like to be careful with the language I use here because “failed to reject” is not the same as “accepted.” The data is directionally consistent with my hypothesis (the sign is positive, the magnitude is meaningful, the p-value is not too far from 0.05), but the evidence is not strong enough to rule out the possibility that the pattern is noise. With only 42 counties, the sample is small and the standard error on the slope is correspondingly wide, so borderline p-values should be expected even when a real effect exists.</p>
+<h3 id="excluding-the-hungarian-majority-counties">Excluding the Hungarian-majority counties</h3>
+<p>Harghita and Covasna are clear outliers in the scatterplot above. Both gave Dan well over 80% of the vote despite having only moderate average salaries, and the reason is well understood in Romanian politics: they are the two counties where ethnic Hungarians are the majority, and the Hungarian minority has historically voted as a bloc against Romanian nationalist candidates like Simion, having done the same in previous electionss where a far-right candidate reached the second round of the presidential elections. Their support for Dan is driven by ethnic identity, not by income. Since my hypothesis is specifically about an income-vote share relationship, it is worth checking what the picture looks like with those two counties set aside.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>vote_no_hun</span> <span class='op'>&lt;-</span> <span class='va'>vote_clean</span> <span class='op'>|&gt;</span></span>
+<span>  <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='op'>!</span><span class='op'>(</span><span class='va'>County</span> <span class='op'><a href='https://rdrr.io/r/base/match.html'>%in%</a></span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Harghita"</span>, <span class='st'>"Covasna"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='fu'>ggplot</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>vote_no_hun</span>,</span>
+<span>       mapping <span class='op'>=</span> <span class='fu'>aes</span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>Avg_Net_Salary_RON_Jun2025</span>,</span>
+<span>                     y <span class='op'>=</span> <span class='va'>Nicusor_Dan_Pct</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'>geom_point</span><span class='op'>(</span>color <span class='op'>=</span> <span class='st'>"steelblue1"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'>geom_smooth</span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"lm"</span>, se <span class='op'>=</span> <span class='cn'>FALSE</span>, color <span class='op'>=</span> <span class='st'>"steelblue4"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'>labs</span><span class='op'>(</span>x <span class='op'>=</span> <span class='st'>"Average Net Monthly Salary (RON, June 2025)"</span>,</span>
+<span>       y <span class='op'>=</span> <span class='st'>"Nicusor Dan Vote Share (%)"</span><span class='op'>)</span></span></code></pre>
+</div>
+<p><img src="index_files/figure-html5/unnamed-chunk-7-1.png" alt="" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>fit_no_hun</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>Nicusor_Dan_Pct</span> <span class='op'>~</span> <span class='va'>Avg_Net_Salary_RON_Jun2025</span>, data <span class='op'>=</span> <span class='va'>vote_no_hun</span><span class='op'>)</span></span>
+<span><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>fit_no_hun</span><span class='op'>)</span></span></code></pre>
+</div>
+<pre><code>
+Call:
+lm(formula = Nicusor_Dan_Pct ~ Avg_Net_Salary_RON_Jun2025, data = vote_no_hun)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-14.5059  -3.9740   0.0161   2.2332  16.1873 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                14.793716   8.107396   1.825   0.0759 .  
+Avg_Net_Salary_RON_Jun2025  0.007471   0.001653   4.520 5.87e-05 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 6.74 on 38 degrees of freedom
+Multiple R-squared:  0.3496,    Adjusted R-squared:  0.3325 
+F-statistic: 20.43 on 1 and 38 DF,  p-value: 5.874e-05</code></pre>
+</div>
+<p>With Harghita and Covasna removed, the relationship tightens noticeably. The slope on salary gets larger, the standard error shrinks, and the p-value drops below the 0.05 threshold, meaning on this subsample I would actually reject the null of no association. In substantive terms, once I am looking only at counties where the vote is not being driven by ethnic-minority bloc behavior, the income story looks considerably stronger: richer counties really did give Dan more support, at a rate that is now distinguishable from chance. The R-squared also rises, telling me salary explains a larger share of the variation among the remaining 40 counties than it did in the full 42.</p>
+<p>This does not mean I should “prefer” the result without Harghita and Covasna, because dropping inconvenient data points until the p-value falls is the kind of p-hacking that makes others’ results untrustworthy. What it does mean is that the weak bivariate result in the full sample was partly masked by two counties that are unusual for reasons my theory does not speak to, and once that noise is set aside, the income pattern emerges more clearly. The honest reading is that both regressions are informative: the full-sample one tells me that any interpretation of Romanian voting behavior must reckon with ethnic politics, and the restricted-sample one tells me that within the ethnic-Romanian majority of the country, the income-vote share relationship is real.</p>
+<h3 id="caveats">Caveats</h3>
+<p>A few caveats that any responsible reader shall keep in mind:</p>
+<p>First, nothing here is causal. Counties are not randomly assigned their income levels, and these are correlated with things I have not measured: education, median age, ethnic composition, exposure to diaspora media. The regression tells me what predicts what, not what causes what. A true causal estimate would require something like an instrumental variable or a natural experiment, neither of which I have.</p>
+<p>Second, 42 is a small n for drawing strong conclusions, and 40 is definitely not much better. Running the same analysis at the UAT level (n &gt; 3000) would very likely produce tighter standard errors and a clearer verdict either way, however clean datasets including average income at that granular a level are not readily available to the public.</p>
+<p>Third, the robustness check using the restricted sample is a probing of, not replacement to, the main result. The “real” political story of the election is one in which Harghita and Covasna exist and vote the way they do, and any model of Romanian voting that drops them permanently would be hiding part of the picture rather than clarifying it.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The analysis gives modest, directionally consistent, and partly sample-dependent support for my hypothesis. In the full 42-county sample, the point estimate is in the predicted direction and the magnitude is politically meaningful (about 4.8 percentage points of Dan vote share per additional 1,000 RON of average salary), but the bivariate p-value of 0.075 means I cannot formally reject the null of no association at the 0.05 level. However, excluding the two Hungarian-majority counties, whose vote choice was plainly driven by ethnicity rather than other factors, produces a clearly significant income slope in the bivariate model. The honest reading across both of my regressions is that income does have a real (non-causal) association with Dan’s vote share within the ethnic-Romanian majority of the country, but that association is partly masked in the full sample by the distinct behavior of the Hungarian counties.</p>
 <p><em>Sources: AEP/prezenta.roaep.ro (election results); OECD Regional Statistics (GDP); INS TEMPO Online (salary, population); Romanian Census 2021 (demographics).</em></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
