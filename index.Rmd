@@ -1,39 +1,49 @@
+
 ---
-title: "PS270 Final Project"
+title: "Income and Support for Nicușor Dan in Romania’s 2025 Presidential Election"
 author: Rares-Matei Puiu
-description: "Do Romanian working-class voters feel left behind?"
 output:
   distill::distill_article:
     self_contained: false
 ---
-
-```{r, echo=F}
+```{r, echo=FALSE, results="asis"}
+htmltools::HTML('
+<div style="display:flex; height:30px; width:100%; margin-bottom:1rem;">
+  <div style="flex:1; background:#002B7F;"></div>
+  <div style="flex:1; background:#FCD116;"></div>
+  <div style="flex:1; background:#CE1126;"></div>
+</div>
+')
+```
+```{r, include=F}
 rm(list=ls())
 library(tidyverse)
+library(ggrepel)
 ```
-
-# **Milestone 4: Visualization and Analysis**
 
 ## Project Overview
 
-On May 18, 2025, Romania held the second round of its presidential election. Independent candidate Nicusor Dan defeated George Simion (AUR) with 53.6% of the vote nationally, but the county-level map told a more striking story. Dan swept the wealthier, more urbanized counties (Cluj, Timis, Brasov, Bucuresti), while Simion dominated poorer, more rural ones (Gorj, Calarasi, Tulcea, Suceava).
+On May 18, 2025, Romania held the second round of its presidential election. Independent candidate Nicusor Dan defeated George Simion (AUR) with 53.6% of the vote nationally, but the county-level map told a more striking story. Dan swept the wealthier, more urbanized counties (Cluj, Timis, Brasov, Bucuresti), while Simion dominated in poorer, more rural ones (Gorj, Calarasi, Tulcea, Suceava).
 
-This project merges official AEP election results with county-level economic and demographic indicators to ask: **how is county-level support for Nicusor Dan related to average income?**
-**I hypothesize that Dan's vote share will be higher in wealthier counties and lower in poorer ones.**
+This project merges official AEP election results with county-level economic and demographic indicators to ask: How is county-level support for Nicusor Dan related to average income? **I hypothesize that Dan's vote share will be higher in wealthier counties and lower in poorer ones.** 
 
 The theoretical logic is that Dan, as an independent pro-EU technocrat, appealed to urban, economically integrated voters, while Simion mobilized support in counties where incomes are lower and dissatisfaction with the economic status quo runs deeper.
 
-My explanatory variable is **average net monthly salary** (`Avg_Net_Salary_RON_Jun2025`), measured in RON per county as reported by INS. My outcome variable is **Nicusor Dan's vote share** (`Nicusor_Dan_Pct`), the percentage of valid votes he received in each county. Evidence supporting my hypothesis would be a positive relationship between salary and Dan's vote share. Evidence against would be a flat or downright negative relationship.
+My question has implications beyond Romania. The country has the highest rate of severe material deprivation in the EU at 17.2 percent, almost triple the EU average, and rural poverty rates run as high as 30 percent against just 2 percent in Bucuresti. At the same time, Bucharest-Ilfov sits in the same productivity tier as regions in Germany and the Netherlands (146% of EU average), while the North-East region produces less than half the EU average (45%). Few European countries have this much economic disparity between their richest and poorest regions, which makes Romania an unusually clean setting in which to test whether economic conditions actually predict vote choice. The 2025 race was also widely covered as a test case for whether the nationalist, EU-skeptical populism reshaping Hungary and Poland could break through in Romania, and answering whether the divide is really about income, urbanization, or identity speaks to a broader debate in comparative politics about whether populist support is best explained by economic grievance or by cultural cleavages.
 
-To make this testable, I set up the regression slope on salary as the parameter I care about. The null hypothesis is that salary and Dan's vote share are unrelated across counties, meaning the true slope is zero. The alternative is that there is some association, positive or negative. Because my hypothesis is directional (more money, more Dan support), I expect a positive slope, but I will use a two-sided test at the usual 0.05 level so I do not give myself credit for a result that happens to land on the "right" side by chance. Following the setup from lecture, the test statistic takes the form of observed value minus null guess, all divided by the standard error, and by the CLT it is approximately standard normal under the null. The decision rule is simple: reject the null if the test statistic is further than 1.96 from zero in either direction, which is the same as rejecting if the p-value is below 0.05.
+As I observe all 42 of Romania's counties at a single point in time (June 2025) and use variation across them, not within them over time, **this is a cross-sectional design** My independent (explanatory) variable is **average net monthly salary** (`Avg_Net_Salary_RON_Jun2025`), measured in RON per county as reported by INS. My dependent (outcome) variable is **Nicusor Dan's vote share** (`Nicusor_Dan_Pct`), the percentage of valid votes he received in each county. Evidence supporting my hypothesis would be a positive relationship between salary and Dan's vote share. Evidence against would be a flat or downright negative relationship.
 
-## Loading the Data & Cleaning It
+To make this testable, I set up the regression slope on salary as the parameter I care about. The null hypothesis is that salary and Dan's vote share are unrelated across counties, meaning the true slope is zero. The alternative is that there is some association, positive or negative. Because my hypothesis is directional (more money, more Dan support), I expect a positive slope, but I will use a two-sided test at the usual alpha = 0.05 level so as to not take credit for a result that happens to land on the "correct" side by chance. Following the setup from lecture, the test statistic takes the form of observed value minus null guess, all divided by the standard error, and by the CLT it is approximately standard normal under the null. The decision rule is simple: reject the null if the test statistic is further than 1.96 from zero in either direction, which is the same as rejecting if the p-value is below 0.05.
 
-I create a new variable for the vote margin between the two candidates, convert the Winner column into a factor, bin counties into salary tiers, and flag whether each county is majority urban or rural.
+## Loading, Cleaning and Showing the Data
+
+I plotted Dan's vote share onto a barplot for easy viewing, created a new variable for the vote margin between the two candidates, converted the Winner column into a factor, binned counties into salary tiers, and flagged whether each county is majority urban or rural.
 
 ```{r, echo=FALSE}
 vote <- read.csv("data/prez2025.csv")
+```
 
+```{r, include=FALSE}
 vote_clean <- vote |>
   mutate(
     Dan_Margin = Nicusor_Dan_Pct - George_Simion_Pct,
@@ -46,6 +56,25 @@ vote_clean <- vote |>
     Urban_Rural = if_else(Pct_Urban >= 50, "Majority Urban", "Majority Rural")
   )
 vote_clean
+```
+
+```{r echo=FALSE}
+ggplot(vote_clean,
+       aes(x = reorder(County, Nicusor_Dan_Pct),
+           y = Nicusor_Dan_Pct,
+           fill = Winner)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Dan" = "steelblue1", "Simion" = "firebrick3")) +
+  labs(
+    title = "Nicusor Dan Vote Share by County",
+    subtitle = "Romania 2025 Presidential Election, Round 2",
+    x = "",
+    y = "Nicusor Dan Vote Share (%)",
+    fill = "County winner"
+  ) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 5))
 ```
 
 ```{r, echo=FALSE}
@@ -77,46 +106,65 @@ vote_clean |>
   )
 ```
 
-## Visualization
+## Results
 
-```{r}
+```{r, echo=FALSE}
 ggplot(data = vote_clean,
        mapping = aes(x = Avg_Net_Salary_RON_Jun2025,
                      y = Nicusor_Dan_Pct)) +
   geom_point(color = "steelblue1") +
   geom_smooth(method = "lm", se = FALSE, color = "steelblue4") +
+  geom_text_repel(
+    data = vote_clean |>
+      filter(County %in% c("București", "Harghita", "Covasna"))
+    ,
+    aes(label = County),
+    size = 3.3,
+    min.segment.length = 0
+  ) +
   labs(x = "Average Net Monthly Salary (RON, June 2025)",
-       y = "Nicusor Dan Vote Share (%)")
+     y = "Nicusor Dan Vote Share (%)",
+     title = "Richer Counties Gave Dan a Higher Vote Share",
+     subtitle = "Romania 2025 Presidential Election, Round 2 (42 counties)") 
 ```
 
 The plot shows a positive relationship between average salary and Nicusor Dan's vote share across Romania's 42 counties. As average monthly salary rises, Dan's vote share tends to rise with it, consistent with the hypothesis that wealthier counties were more supportive of the moderate pro-EU independent candidate.
 
-The relationship is positive but not tight. There is substantial scatter around the line. Bucuresti appears as a high-salary, high-support point in the upper right, while Harghita and Covasna sit well above the line, with extremely high Dan vote share despite only moderate incomes. These two counties are majority Hungarian-speaking and have a distinct voting history, suggesting that factors beyond income (regional identity, ethnicity, Simion's xenophobia) also shape vote choice.
+The relationship is positive but not tight. There is substantial scatter around the line. Bucuresti appears as a high-salary, high-support point in the upper right, while Harghita and Covasna sit well above the line, with extremely high Dan vote share despite only moderate incomes. These two counties are majority Hungarian-speaking and have a distinct voting history, suggesting that factors beyond income (regional identity, ethnicity, Simion's explicit anti-Magyar sentiment) also shape vote choice.
 
 ## Regression and Hypothesis Test
 
 To put a number on the relationship and formally test whether the slope on salary is different from zero, I fit a linear regression of Dan's vote share on average net monthly salary.
 
-```{r}
+```{r, echo=FALSE}
 fit <- lm(Nicusor_Dan_Pct ~ Avg_Net_Salary_RON_Jun2025, data = vote_clean)
-summary(fit)
+
+main_table <- summary(fit)$coefficients
+rownames(main_table) <- c("Intercept", "Average net monthly salary (RON)")
+
+knitr::kable(
+  main_table,
+  digits = 5,
+  col.names = c("Estimate", "Std. Error", "t value", "p-value"),
+  caption = "Regression of Nicușor Dan Vote Share on Average Net Monthly Salary"
+)
 ```
 
 ### Interpreting the bivariate regression
 
-The estimated slope on salary is about 0.00482. Because salary is measured in RON and Dan's vote share is measured in percentage points, that coefficient says each extra 1 RON of average monthly salary is associated with about a 0.00482 percentage-point increase in Dan's vote share. That number is hard to feel, so rescaling: **every additional 1,000 RON of average monthly salary is associated with roughly a 4.82 percentage-point increase in Dan's vote share**.
+The estimated slope on salary is about 0.00482. Because salary is measured in RON and Dan's vote share is measured in percentage points, that coefficient says each extra 1 RON of average monthly salary is associated with about a 0.00482 percentage-point increase in Dan's vote share. That number is hard to conceptualize, so to rescale: **every additional 1,000 RON of average monthly salary is associated with roughly a 4.82 percentage-point increase in Dan's vote share**.
 
 The intercept is about 29.55, which would be the model's prediction for Dan's vote share in a county with zero average salary. That number has no substantive interpretation (no such county exists, and even Romania's poorest counties are nowhere near zero), it is just where the line crosses the y-axis to fit the data that does exist.
 
-Now the hypothesis test. The `summary()` output gives a test statistic for the salary coefficient of about 1.83 and a p-value of about 0.075. Reading those through the lecture framework: the test statistic is the slope divided by its standard error, so 1.83 means the estimated slope is about 1.83 standard errors away from zero. The decision rule was to reject the null if that statistic was further than 1.96 from zero, and 1.83 does not clear that bar. Equivalently, the p-value of 0.075 says that if the true slope really were zero, we would still see a slope at least this large in absolute value about 7.5% of the time just from random sampling variation across counties. That is uncommon, but not rare enough to rule out chance at the 0.05 level (95 CI)
+Now the hypothesis test. The regression table gives a test statistic for the salary coefficient of about 1.83 and a p-value of about 0.075. Reading those through the lecture framework: the test statistic is the slope divided by its standard error, so 1.83 means the estimated slope is about 1.83 standard errors away from zero. The decision rule was to reject the null if that statistic was further than 1.96 from zero, and 1.83 does not clear that bar. Equivalently, the p-value of 0.075 says that if the true slope really were zero, we would still see a slope at least this large in absolute value about 7.5% of the time just from random sampling variation across counties. That is uncommon, but not rare enough to rule out chance at the 0.05 level (95 CI)
 
 Thus, strictly speaking, **I failed to reject the null hypothesis**. I would like to be careful with the language I use here because "failed to reject" is not the same as "accepted." The data is directionally consistent with my hypothesis (the sign is positive, the magnitude is meaningful, the p-value is not too far from 0.05), but the evidence is not strong enough to rule out the possibility that the pattern is noise. With only 42 counties, the sample is small and the standard error on the slope is correspondingly wide, so borderline p-values should be expected even when a real effect exists.
 
 ### Excluding the Hungarian-majority counties
 
-Harghita and Covasna are clear outliers in the scatterplot above. Both gave Dan well over 80% of the vote despite having only moderate average salaries, and the reason is well understood in Romanian politics: they are the two counties where ethnic Hungarians are the majority, and the Hungarian minority has historically voted as a bloc against Romanian nationalist candidates like Simion, having done the same in previous electionss where a far-right candidate reached the second round of the presidential elections. Their support for Dan is driven by ethnic identity, not by income. Since my hypothesis is specifically about an income-vote share relationship, it is worth checking what the picture looks like with those two counties set aside.
+Harghita and Covasna are clear outliers in the scatterplot above. Both gave Dan well over 80% of the vote (by far his highest shares at the county level) despite having only moderate average salaries, and the reason is well understood in Romanian politics: they are the two counties where ethnic Hungarians are the majority, and have historically voted as a bloc against Romanian nationalist candidates like Simion, having done the same in previous elections where a far-right candidate reached the second round of the presidential elections. Their support for Dan is driven by ethnic identity, not by income. Since my hypothesis is specifically about an income-vote share relationship, it is worth checking what the picture looks like with those two counties set aside.
 
-```{r}
+```{r, echo=F}
 vote_no_hun <- vote_clean |>
   filter(!(County %in% c("Harghita", "Covasna")))
 
@@ -126,30 +174,41 @@ ggplot(data = vote_no_hun,
   geom_point(color = "steelblue1") +
   geom_smooth(method = "lm", se = FALSE, color = "steelblue4") +
   labs(x = "Average Net Monthly Salary (RON, June 2025)",
-       y = "Nicusor Dan Vote Share (%)")
+     y = "Nicusor Dan Vote Share (%)",
+     title = "Excluding Harghita and Covasna, the Income Pattern Tightens",
+     subtitle = "Romania 2025 Presidential Election, Round 2 (40 counties)")
 ```
 
-```{r}
+
+```{r, restricted-regression, echo=FALSE}
 fit_no_hun <- lm(Nicusor_Dan_Pct ~ Avg_Net_Salary_RON_Jun2025, data = vote_no_hun)
-summary(fit_no_hun)
+
+restricted_table <- summary(fit_no_hun)$coefficients
+rownames(restricted_table) <- c("Intercept", "Average net monthly salary (RON)")
+
+knitr::kable(
+  restricted_table,
+  digits = 5,
+  col.names = c("Estimate", "Std. Error", "t value", "p-value"),
+  caption = "Regression Excluding Harghita and Covasna Counties"
+)
 ```
 
-With Harghita and Covasna removed, the relationship tightens noticeably. The slope on salary gets larger, the standard error shrinks, and the p-value drops below the 0.05 threshold, meaning on this subsample I would actually reject the null of no association. In substantive terms, once I am looking only at counties where the vote is not being driven by ethnic-minority bloc behavior, the income story looks considerably stronger: richer counties really did give Dan more support, at a rate that is now distinguishable from chance. The R-squared also rises, telling me salary explains a larger share of the variation among the remaining 40 counties than it did in the full 42.
+
+
+With Harghita and Covasna removed, the relationship tightens noticeably. The slope on salary gets larger (**every additional 1,000 RON of average monthly salary is associated with roughly a 7.47 percentage-point increase in Dan's vote share**), the standard error shrinks, and the p-value drops far below the 0.05 threshold, meaning on this subsample I would actually reject the null of no association. In substantive terms, once I am looking only at counties where the vote is not being driven by ethnic-minority bloc behavior, the income story looks considerably stronger: richer counties really did give Dan more support, at a rate that is now distinguishable from chance.
 
 This does not mean I should "prefer" the result without Harghita and Covasna, because dropping inconvenient data points until the p-value falls is the kind of p-hacking that makes others' results untrustworthy. What it does mean is that the weak bivariate result in the full sample was partly masked by two counties that are unusual for reasons my theory does not speak to, and once that noise is set aside, the income pattern emerges more clearly. The honest reading is that both regressions are informative: the full-sample one tells me that any interpretation of Romanian voting behavior must reckon with ethnic politics, and the restricted-sample one tells me that within the ethnic-Romanian majority of the country, the income-vote share relationship is real.
 
-### Caveats
-
-A few caveats that any responsible reader shall keep in mind:
-
-First, nothing here is causal. Counties are not randomly assigned their income levels, and these are correlated with things I have not measured: education, median age, ethnic composition, exposure to diaspora media. The regression tells me what predicts what, not what causes what. A true causal estimate would require something like an instrumental variable or a natural experiment, neither of which I have.
-
-Second, 42 is a small n for drawing strong conclusions, and 40 is definitely not much better. Running the same analysis at the UAT level (n > 3000) would very likely produce tighter standard errors and a clearer verdict either way, however clean datasets including average income at that granular a level are not readily available to the public.
-
-Third, the robustness check using the restricted sample is a probing of, not replacement to, the main result. The "real" political story of the election is one in which Harghita and Covasna exist and vote the way they do, and any model of Romanian voting that drops them permanently would be hiding part of the picture rather than clarifying it.
-
 ## Conclusion
 
-The analysis gives modest, directionally consistent, and partly sample-dependent support for my hypothesis. In the full 42-county sample, the point estimate is in the predicted direction and the magnitude is politically meaningful (about 4.8 percentage points of Dan vote share per additional 1,000 RON of average salary), but the bivariate p-value of 0.075 means I cannot formally reject the null of no association at the 0.05 level. However, excluding the two Hungarian-majority counties, whose vote choice was plainly driven by ethnicity rather than other factors, produces a clearly significant income slope in the bivariate model. The honest reading across both of my regressions is that income does have a real (non-causal) association with Dan's vote share within the ethnic-Romanian majority of the country, but that association is partly masked in the full sample by the distinct behavior of the Hungarian counties.
+The analysis gives modest, directionally consistent, and partly sample-dependent support for my hypothesis. In the full 42-county sample, the point estimate is in the predicted direction and the magnitude is politically meaningful (about 4.8 percentage points of Dan vote share per additional 1,000 RON of average salary), but the bivariate p-value of 0.075 means I could not formally reject the null of no association at the 0.05 level. However, excluding the two Hungarian-majority counties, whose vote choice was plainly driven by fear of what a Simion presidency would mean for ethnic Hungarians under a ethno-nationalist candidate, produces a clearly significant income slope. The honest reading across both regressions is that income has a real (non-causal) association with Dan's vote share within the ethnic-Romanian majority of the country, but that association is partly masked in the full sample by the distinct behavior of the Hungarian counties. Of further note, dropping Harghita and Covasna is a probe of, not a replacement for, the main result; the real political story of the election is one in which those counties do, in fact, exist and vote the way they do, and any model that drops them permanently would be hiding part of the picture rather than clarifying it.
 
-_Sources: AEP/prezenta.roaep.ro (election results); OECD Regional Statistics (GDP); INS TEMPO Online (salary, population); Romanian Census 2021 (demographics)._
+Several limitations and threats to inference are worth naming directly. Firstly, nothing hereinbefore is causal. Counties are not randomly assigned their income levels, and income is correlated with things I have not measured, such as education, personal networks, parental wealth among many others. The regression tells us what predicts what, not what causes what. Second, this is a county-level analysis, which means it is vulnerable to ecological inference problems — a positive relationship between county-level salary and county-level Dan support does not, on its own, tell me that poorer individuals were less likely to vote for Dan. Third, n = 42 is small, and n = 40 in the restricted sample is not much better; standard errors are correspondingly wide, which is part of why the bivariate p-value sits in the borderline range.
+
+Which brings me to what I'd do with more time and resources. I believe there are several improvements which would sharpen the analysis. The most straightforward would be to repeat the regression at the UAT (commune/town) level, where n exceeds 3,000 and standard errors would shrink considerably; the obstacle is that granular public datasets tracking UAT-level salary are not readily available. To get closer to a causal estimate, individual-level survey data would be even better, since it would let me regress vote choice on personal income directly and avoid the ecological inference problem entirely. Each of those would bring me closer to the question I actually care about: whether the populist–technocrat divide in Romanian politics is fundamentally about economic conditions, or about something else that happens to track income.
+
+_Sources: AEP/prezenta.roaep.ro (election results); INS TEMPO Online (county-level salary and population); Eurostat regional statistics and European Commission 2024 country report (regional GDP, productivity, deprivation); OECD Labour Market Reviews: Romania 2025 (comparative indicators); Romanian Census 2021 (demographics); AI as a learning tool to create the Romanian flag banner :)_
+```{r print-code, ref.label=knitr::all_labels(), echo = TRUE, eval=FALSE}
+
+```
